@@ -4,13 +4,21 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.SceneManagement;
 
+public enum TypeAction
+{
+    INCREASE = 0,
+    DECREASE = 1,
+    EXPLOSION = 2
+}
 public class GameHelper : MonoBehaviour
 {
     public float BoxSize;               // вместимость
     public float percentWin;            //процент вместимости для победы
     public float timerCoroutine;        //время ожирания корутины
     public float timerSpawnTarget;      // пауза при спавне Target
-    public int maxTrgetInScene;         // максимальное кол-во Target
+    public int maxSpawnTarget;         // максимальное кол-во Target
+    public int spawnTargetOneMoument;
+
 
     public GameObject cattleCorral;     // загон
     public GameObject pasture;          // пастбище
@@ -19,8 +27,6 @@ public class GameHelper : MonoBehaviour
     public GameObject panelVin;         //панель победы
     public List<Target> targets;        //Trgets
 
-    private float secondgametime; 
-
     public bool folow;                  // двигаемся?
     public bool endGame = false;        // конец игры
 
@@ -28,6 +34,8 @@ public class GameHelper : MonoBehaviour
     private MeshFilter meshCattleCorral;// загон
     private MeshFilter meshpasture;     // пастбище
     private GameObjectPool objectPool;  //pool
+    private int spawnTarget;
+    private float secondgametime;
 
 
     private void Awake()
@@ -42,9 +50,14 @@ public class GameHelper : MonoBehaviour
     private void Start()
     {
         gateAnimator.SetBool("isOpened", false);
+
+        for (int i = 0; i < objectPool.caches.Length; i++)
+        {
+            objectPool.OnInitialized();
+        }
+
         StartGame();
-        objectPool.caches[0].cacheSize = maxTrgetInScene;
-        objectPool.OnInitialized();
+
     }
 
     private void Update()
@@ -70,7 +83,7 @@ public class GameHelper : MonoBehaviour
                     {
                         gateAnimator.SetBool("isOpened", false);
                     }
-                    StopGame();
+                    StartCoroutine(WaitClosedGate());
                 }
                 ++i;
             }
@@ -90,22 +103,27 @@ public class GameHelper : MonoBehaviour
                 {
                     gateAnimator.SetBool("isOpened", false);
                 }
-                StopGame();
+                StartCoroutine(WaitClosedGate());
             }
 #endif
 
-            if (folow)
+            if (folow && maxSpawnTarget > spawnTarget)
             {
                 secondgametime += Time.deltaTime;
                 if (secondgametime >= timerSpawnTarget)
                 {
-                    GameObject ob =  GameObjectPool.Spawn(objectPool.caches[0].prefab, GetRandomPos(pasture, meshpasture), Quaternion.Euler(0f, Random.Range(0, 360f), 0f));
-                    NavMeshAgent navMeshAgent = ob.GetComponent<NavMeshAgent>();
-                    navMeshAgent.SetDestination(GetRandomPos(cattleCorral, cattleCorral.GetComponent<MeshFilter>()));
-                    Animator animator = ob.GetComponent<Animator>();
-                    animator.SetInteger("animation", 1);
-                    animator.speed = navMeshAgent.speed + ob.GetComponent<Target>().SpedAnimationTarget;
-                    secondgametime = 0;
+                    for(int t = 0; t < spawnTargetOneMoument; t++)
+                    {
+                        GameObject ob = GameObjectPool.Spawn(objectPool.caches[Random.Range(0, objectPool.caches.Length)].prefab, GetRandomPos(pasture, meshpasture), Quaternion.Euler(0f, Random.Range(0, 360f), 0f));
+                        NavMeshAgent navMeshAgent = ob.GetComponent<NavMeshAgent>();
+                        navMeshAgent.SetDestination(GetRandomPos(cattleCorral, cattleCorral.GetComponent<MeshFilter>()));
+                        Animator animator = ob.GetComponent<Animator>();
+                        animator.SetInteger("animation", 1);
+                        animator.speed = navMeshAgent.speed + ob.GetComponent<Target>().SpedAnimationTarget;
+                        secondgametime = 0;
+                        spawnTarget++;
+                    }
+                    
                 }
             }
 
@@ -117,21 +135,21 @@ public class GameHelper : MonoBehaviour
     {
         for (int i = 0; i < objectPool.caches.Length; i++)
         {
-            for (int o = 0; o < objectPool.caches[i].cacheSize; o++)
-            {
-                GameObjectPool.Spawn(objectPool.caches[i].prefab, GetRandomPos(pasture, meshpasture), Quaternion.Euler(0f, Random.Range(0, 360f), 0f));
-
-            }
-
+            GameObjectPool.Spawn(objectPool.caches[i].prefab, GetRandomPos(pasture, meshpasture), Quaternion.Euler(0f, Random.Range(0, 360f), 0f));
+            spawnTarget++;
         }
     }
 
     private void StopGame()
     {
-        
+
         foreach (Target target in targets)
         {
-            squareTargets += target.square;
+            if(target.typeAction != TypeAction.EXPLOSION)
+            {
+                squareTargets += target.square;
+            }
+            target.Action();
         }
 
         float temp = BoxSize * percentWin;
@@ -156,6 +174,11 @@ public class GameHelper : MonoBehaviour
         endGame = true;
     }
 
+    IEnumerator WaitClosedGate()
+    {
+        yield return new WaitForSeconds(timerCoroutine);
+        StopGame();
+    }
     IEnumerator WaitDrawUI(GameObject gameObject)
     {
         yield return new WaitForSeconds(timerCoroutine);

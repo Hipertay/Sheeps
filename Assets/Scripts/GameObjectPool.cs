@@ -17,9 +17,16 @@ public class GameObjectPool : MonoBehaviour
 		public GameObject prefab;       
 		[SerializeField]
 		public int cacheSize = 10;
+		public TypeAction typeAction;      //тип действия
+		public float square;              //площадь занимаемая персонажем
+		public float scaledPower;          //кратность увеличения/уменьшения
+		public float minSpedTarget;       //скорость персонажа min
+		public float maxSpedTarget;       //скорость персонажа max
+
 
 		private int cacheIndex = 0;
 		private GameObject[] objects;
+		private GameObject ob;
 
 		[HideInInspector]
 		public void Initialize()
@@ -54,6 +61,7 @@ public class GameObjectPool : MonoBehaviour
 					" exceeds cache size of " + cacheSize +
 					"! Reusing already active object.", obj);
 				GameObjectPool.Unspawn(obj);
+
 			}
 			cacheIndex = (cacheIndex + 1) % cacheSize;
 			return obj;
@@ -102,6 +110,12 @@ public class GameObjectPool : MonoBehaviour
 			return GameObject.Instantiate ( prefab, position, rotation ) as GameObject;
 		}
 		GameObject obj = cache.GetNextObjectInCache();
+		Target target = obj.GetComponent<Target>();
+		target.typeAction = cache.typeAction;
+		target.square = cache.square;
+		target.scaledPower = cache.scaledPower;
+		target.minSpedTarget = cache.minSpedTarget;
+		target.maxSpedTarget = cache.maxSpedTarget;
 		obj.transform.position = position;
 		obj.transform.rotation = rotation;
 		obj.SetActive(true);
