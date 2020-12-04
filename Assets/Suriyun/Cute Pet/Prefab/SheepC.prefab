@@ -323,6 +323,7 @@ SkinnedMeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -427,6 +428,7 @@ GameObject:
   - component: {fileID: 1347706122320337279}
   - component: {fileID: 7552687380092674074}
   - component: {fileID: 3991829388809189919}
+  - component: {fileID: 8797916465913649451}
   m_Layer: 8
   m_Name: SheepC
   m_TagString: Explosion
@@ -514,7 +516,6 @@ MonoBehaviour:
   maxPositionFly: 7
   timeCourotine: 0
   skinnedMesh: {fileID: 137979296400250712}
-  particleSystem: {fileID: 0}
   prefabParticle: {fileID: 193692, guid: 2aa1e7c21640d254492fa8035a6411e1, type: 3}
   updatePosition: 1
   gravitation: 0
@@ -543,12 +544,12 @@ CapsuleCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1524351440229938}
   m_Material: {fileID: 0}
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_Enabled: 1
-  m_Radius: 0.4
-  m_Height: 0.74
+  m_Radius: 0.1
+  m_Height: 0.4
   m_Direction: 1
-  m_Center: {x: -0.0028016567, y: 0.23409665, z: -0.032996215}
+  m_Center: {x: -0.0028016567, y: 0.16, z: 0}
 --- !u!208 &3991829388809189919
 NavMeshObstacle:
   m_ObjectHideFlags: 0
@@ -565,6 +566,19 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 1
   m_Center: {x: 0, y: 0.15, z: 0}
   m_TimeToStationary: 0.5
+--- !u!135 &8797916465913649451
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1524351440229938}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1526109293832292
 GameObject:
   m_ObjectHideFlags: 0

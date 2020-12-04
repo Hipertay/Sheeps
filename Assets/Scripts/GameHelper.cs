@@ -174,7 +174,8 @@ public class GameHelper : MonoBehaviour
                         }
                         else
                         {
-                            if (rnd < (100 - percentSpawnExplosion) / 2)
+                            int rnd_2 = Random.Range(0, 100 - (int)percentSpawnExplosion);
+                            if (rnd_2 < (100 - percentSpawnExplosion) / 2)
                             {
                                 for (int o = 0; o < objectPool.caches.Count; o++)
                                 {
@@ -199,6 +200,7 @@ public class GameHelper : MonoBehaviour
                         }
                         NavMeshAgent navMeshAgent = ob.GetComponent<NavMeshAgent>();
                         navMeshAgent.SetDestination(GetRandomPos(cattleCorral, meshCattleCorral));
+                        //Debug.Log(navMeshAgent.gameObject.name);
                         Animator animator = ob.GetComponent<Animator>();
                         animator.SetInteger("animation", 1);
                         animator.speed = navMeshAgent.speed + ob.GetComponent<Target>().SpedAnimationTarget;
@@ -330,7 +332,7 @@ public class GameHelper : MonoBehaviour
             {
                 if(Random.Range(0, 100) < persecntToDestroy)
                 {
-                    Debug.Log("Unspawn " + targetsKick[i].name);
+                    //Debug.Log("Unspawn " + targetsKick[i].name);
                     targets.Remove(targetsKick[i].GetComponent<Target>());
                     targetsKick[i].GetComponent<Target>().KickOut();
                 }
@@ -466,7 +468,7 @@ public class GameHelper : MonoBehaviour
         Vector3 XAxis = rightTop - leftTop;
         Vector3 ZAxis = leftBottom - leftTop;
         Vector3 RndPointonPlane = leftTop + XAxis * Random.value + ZAxis * Random.value;
-
+        //Debug.Log(RndPointonPlane);
         return RndPointonPlane;
     }
 
@@ -478,7 +480,7 @@ public class GameHelper : MonoBehaviour
             index = VerticeList.Count - intexTemp;
             index -= 1;
         }
-        Vector3 RndPointonPlane = cattleCorral.transform.TransformPoint(VerticeList[index]); ;
+        Vector3 RndPointonPlane = cattleCorral.transform.TransformPoint(VerticeList[index]);
         inverse = !inverse;
         intexTemp++;
         if (intexTemp >= VerticeList.Count)
