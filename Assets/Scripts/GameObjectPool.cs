@@ -1,11 +1,12 @@
 ﻿using UnityEngine;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 
 public class GameObjectPool : MonoBehaviour
 {
 	static GameObjectPool Pool;
-	public ObjectCache[] caches;
+	public List<ObjectCache> caches;
 
 	public Hashtable activeCachedObjects;
 
@@ -84,7 +85,7 @@ public class GameObjectPool : MonoBehaviour
     {
 		Pool = this;
 		int amount = 0;
-		for (var i = 0; i < caches.Length; i++)
+		for (var i = 0; i < caches.Count; i++)
 		{
 			caches[i].Initialize();
 			amount += caches[i].cacheSize;
@@ -97,7 +98,7 @@ public class GameObjectPool : MonoBehaviour
 		ObjectCache cache = null;
 		if ( Pool != null )
 		{
-			for ( var i = 0; i < Pool.caches.Length; i++)
+			for ( var i = 0; i < Pool.caches.Count; i++)
 			{
 				if ( Pool.caches[i].prefab == prefab )
 				{

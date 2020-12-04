@@ -429,7 +429,7 @@ GameObject:
   - component: {fileID: 3991829388809189919}
   m_Layer: 8
   m_Name: SheepC
-  m_TagString: Untagged
+  m_TagString: Explosion
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -442,7 +442,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1524351440229938}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -6.789027, y: -2.2946258e-17, z: 1.5219159}
   m_LocalScale: {x: 1.5, y: 1.5, z: 1.3}
   m_Children:
   - {fileID: 4931885716498706}
@@ -510,8 +510,12 @@ MonoBehaviour:
   maxSpedTarget: 1
   SpedAnimationTarget: 1.5
   spedRotation: 5
-  minPositionFly: 5
-  maxPositionFly: 5
+  minPositionFly: 7
+  maxPositionFly: 7
+  timeCourotine: 0
+  skinnedMesh: {fileID: 137979296400250712}
+  particleSystem: {fileID: 0}
+  prefabParticle: {fileID: 193692, guid: 2aa1e7c21640d254492fa8035a6411e1, type: 3}
   updatePosition: 1
   gravitation: 0
   flyobject: 0
@@ -539,12 +543,12 @@ CapsuleCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1524351440229938}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
-  m_Radius: 0.10944748
-  m_Height: 0.2759145
+  m_Radius: 0.4
+  m_Height: 0.74
   m_Direction: 1
-  m_Center: {x: 0.0011533102, y: 0.11225166, z: 0}
+  m_Center: {x: -0.0028016567, y: 0.23409665, z: -0.032996215}
 --- !u!208 &3991829388809189919
 NavMeshObstacle:
   m_ObjectHideFlags: 0

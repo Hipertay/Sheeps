@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using DG.Tweening;
+using System.Linq;
 
 public class Target : MonoBehaviour
 {
@@ -14,27 +16,30 @@ public class Target : MonoBehaviour
     public float spedRotation;        //скорость поворота
     public float minPositionFly;       // min прыжок
     public float maxPositionFly;       // max прыжок
+    public float timeCourotine;
+    public SkinnedMeshRenderer skinnedMesh;
+    public GameObject prefabParticle;
 
     public float updatePosition;       //расстояние для обновления позиции
 
     public bool gravitation;           //гравитация on/off
     public bool flyobject;
 
+
     GameHelper gameHelper;
     bool touch;
-    MeshFilter meshFilter;
     Animator animator;
     Rigidbody rigidbody;
     Vector3 randomPosition;
     Vector3 scale;
-    bool isScaled;
+    bool isPosition;
 
 
     public NavMeshAgent Agent { get; private set; }
     // Start is called before the first frame update
     void Start()
     {
-        isScaled = false;
+        isPosition = false;
         touch = false;
         flyobject = false;
         gravitation = true;
@@ -42,31 +47,17 @@ public class Target : MonoBehaviour
         Agent.speed = Random.Range(minSpedTarget, maxSpedTarget);
         animator = GetComponent<Animator>();
         gameHelper = FindObjectOfType<GameHelper>();
-        meshFilter = gameHelper.cattleCorral.GetComponent<MeshFilter>();
         rigidbody = GetComponent<Rigidbody>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (isScaled)
-        {
-            this.gameObject.transform.localScale = new Vector3(Mathf.Lerp(scale.x, gameObject.transform.localScale.x, 1 * Time.deltaTime), Mathf.Lerp(scale.y, gameObject.transform.localScale.y, 1 * Time.deltaTime), Mathf.Lerp(scale.z, gameObject.transform.localScale.z, 1 * Time.deltaTime));
-        }
 
         var look = Quaternion.LookRotation(randomPosition - transform.position);
         transform.rotation = Quaternion.Lerp(transform.rotation, look, spedRotation * Time.deltaTime);
         var heading = randomPosition - transform.position;
-        if (heading.sqrMagnitude <= updatePosition)
-        {
-            randomPosition = gameHelper.GetRandomPos(gameHelper.cattleCorral, meshFilter);
-            if (Agent.enabled)
-            {
-                Agent.SetDestination(randomPosition);
-                Agent.isStopped = false;
-                Agent.speed = minSpedTarget;
-            }
-        }
+
         if (!touch)
         {
             int i = 0;
@@ -96,11 +87,19 @@ public class Target : MonoBehaviour
             }
 #endif
         }
+
+
     }
 
     public void Folov()
     {
-        randomPosition = gameHelper.GetRandomPos(gameHelper.cattleCorral, meshFilter);
+        if (!isPosition)
+        {
+            randomPosition = gameHelper.GetRandomPosGate();
+            isPosition = true;
+        }
+
+
         if (Agent.enabled)
         {
             Agent.SetDestination(randomPosition);
@@ -126,24 +125,49 @@ public class Target : MonoBehaviour
         {
             case TypeAction.INCREASE:
                 scale = gameObject.transform.localScale * scaledPower;
-                isScaled = true;
+                StartCoroutine(ScaleTarget(gameObject));
+                animator.SetInteger("animation", 0);
                 break;
             case TypeAction.DECREASE:
                 scale = gameObject.transform.localScale / scaledPower;
-                isScaled = true;
+                StartCoroutine(ScaleTarget(gameObject));
+                animator.SetInteger("animation", 0);
                 break;
             case TypeAction.EXPLOSION:
-                Destroy(gameObject);
+                animator.SetInteger("animation", 0);
+                GameObject particle = Instantiate(prefabParticle, transform.position, Quaternion.identity);
+                KickOut();
+                //skinnedMesh.enabled = false;
+                StartCoroutine(Wait());
                 break;
         }
     }
 
+    IEnumerator ScaleTarget(GameObject gameObject)
+    {
+        gameObject.transform.DOScale(scale, timeCourotine);
+        yield return new WaitForSeconds(timeCourotine);
+
+    }
+
+    IEnumerator Wait()
+    {
+        yield return new WaitForSeconds(timeCourotine);
+    }
+
     public void KickOut()
     {
-        if (!gravitation) rigidbody.useGravity = false;
-        Agent.enabled = false;
-        flyobject = true;
-        rigidbody.AddRelativeForce(new Vector3(Random.Range(minPositionFly, maxPositionFly), maxPositionFly, Random.Range(minPositionFly, maxPositionFly)), ForceMode.Impulse);
+            if (!gravitation) rigidbody.useGravity = false;
+            Agent.enabled = false;
+            flyobject = true;
+            rigidbody.AddRelativeForce(new Vector3(Random.Range(minPositionFly, maxPositionFly), Random.Range(minPositionFly, maxPositionFly), Random.Range(minPositionFly, maxPositionFly)), ForceMode.Impulse);
+        
+    }
+
+    public GameObject TargetSearch()
+    {
+        var sersh = gameHelper.targets.OrderBy(x => Vector3.Distance(transform.position, x.transform.position)).FirstOrDefault();
+        return sersh.gameObject;
     }
 
     private void OnTriggerEnter(Collider other)
@@ -152,6 +176,24 @@ public class Target : MonoBehaviour
         {
             gameHelper.targets.Add(this.gameObject.GetComponent<Target>());
             Folov();
+        }
+
+        if (other.CompareTag("Explosion") & !transform.CompareTag("Explosion"))
+        {
+            if (!gameHelper.targetsKick.Contains(gameObject))
+            {
+                gameHelper.targetsKick.Add(gameObject);
+            }
+        }
+
+
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("Explosion"))
+        {
+            gameHelper.targetsKick.Remove(gameObject);
         }
     }
 

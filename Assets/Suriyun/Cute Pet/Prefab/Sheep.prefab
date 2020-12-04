@@ -533,8 +533,12 @@ MonoBehaviour:
   maxSpedTarget: 1
   SpedAnimationTarget: 1.5
   spedRotation: 5
-  minPositionFly: 5
-  maxPositionFly: 5
+  minPositionFly: 7
+  maxPositionFly: 7
+  timeCourotine: 0.5
+  skinnedMesh: {fileID: 0}
+  particleSystem: {fileID: 0}
+  triger: {fileID: 0}
   updatePosition: 1
   gravitation: 0
   flyobject: 0
