@@ -4880,7 +4880,7 @@ MonoBehaviour:
   timerSpawnTarget: 1
   maxSpawnTarget: 200
   spawnTargetOneMoument: 1
-  percentSpawnExplosion: 100
+  percentSpawnExplosion: 10
   _timeToNormal: 1
   _tempScale: 1
   waitStartGame: 0.5
