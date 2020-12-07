@@ -121,23 +121,21 @@ public class Target : MonoBehaviour
 
     public void Action()
     {
+        animator.SetInteger("animation", 0);
+        rigidbody.isKinematic = true;
         switch (typeAction)
         {
             case TypeAction.INCREASE:
                 scale = gameObject.transform.localScale * scaledPower;
                 StartCoroutine(ScaleTarget(gameObject));
-                animator.SetInteger("animation", 0);
                 break;
             case TypeAction.DECREASE:
                 scale = gameObject.transform.localScale / scaledPower;
                 StartCoroutine(ScaleTarget(gameObject));
-                animator.SetInteger("animation", 0);
                 break;
             case TypeAction.EXPLOSION:
-                animator.SetInteger("animation", 0);
                 GameObject particle = Instantiate(prefabParticle, transform.position, Quaternion.identity);
                 KickOut();
-                //skinnedMesh.enabled = false;
                 StartCoroutine(Wait());
                 break;
         }

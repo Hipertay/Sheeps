@@ -161,7 +161,7 @@ public class GameHelper : MonoBehaviour
                     {
                         GameObject ob = new GameObject();
                         int rnd = Random.Range(0, 100);
-                        if (rnd <= percentSpawnExplosion)
+                        if (rnd < percentSpawnExplosion)
                         {
                             for (int o = 0; o < objectPool.caches.Count; o++)
                             {
@@ -367,6 +367,7 @@ public class GameHelper : MonoBehaviour
 
     IEnumerator WaitEndGame()
     {
+        if (targets.Count == 0) waitEndGame = 0;
 
         yield return new WaitForSeconds(waitEndGame);
 
