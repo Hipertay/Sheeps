@@ -56,6 +56,10 @@ public class Target : MonoBehaviour
 
         var look = Quaternion.LookRotation(randomPosition - transform.position);
         transform.rotation = Quaternion.Lerp(transform.rotation, look, spedRotation * Time.deltaTime);
+        if(isAction)
+        {
+            transform.eulerAngles = new Vector3(0f, transform.eulerAngles.y, 0f);
+        }
         var heading = randomPosition - transform.position;
 
         if (!touch)
@@ -93,22 +97,30 @@ public class Target : MonoBehaviour
 
     public void Folov()
     {
-        if (!isPosition)
+        if (!isAction)
         {
-            randomPosition = gameHelper.GetRandomPosGate();
-            isPosition = true;
+            if (!isPosition)
+            {
+                randomPosition = gameHelper.GetRandomPosGate();
+                isPosition = true;
+            }
+
+
+            if (Agent.enabled)
+            {
+                Agent.SetDestination(randomPosition);
+
+                Agent.isStopped = false;
+            }
+
+            animator.SetInteger("animation", 1);
+            animator.speed = Agent.speed + SpedAnimationTarget;
         }
-
-
-        if (Agent.enabled)
+        else
         {
-            Agent.SetDestination(randomPosition);
-
-            Agent.isStopped = false;
+            animator.SetInteger("animation", 0);
+            Agent.enabled = false;
         }
-
-        animator.SetInteger("animation", 1);
-        animator.speed = Agent.speed + SpedAnimationTarget;
 
     }
 
@@ -119,10 +131,14 @@ public class Target : MonoBehaviour
             Agent.isStopped = true;
     }
 
+    bool isAction = false;
+
     public void Action()
     {
+        isAction = true;
         animator.SetInteger("animation", 0);
-        rigidbody.isKinematic = true;
+        Agent.enabled = false;
+        //rigidbody.isKinematic = true;
         switch (typeAction)
         {
             case TypeAction.INCREASE:
@@ -197,23 +213,17 @@ public class Target : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (touch)
+        if (!isAction)
         {
-            if (collision.gameObject.CompareTag("Ground"))
+            if (touch)
             {
-                if (gravitation) rigidbody.useGravity = true;
-                Agent.enabled = true;
-                flyobject = false;
+                if (collision.gameObject.CompareTag("Ground"))
+                {
+                    if (gravitation) rigidbody.useGravity = true;
+                    Agent.enabled = true;
+                    flyobject = false;
+                }
             }
         }
-
     }
-
-
-
-
-
-
-
-
 }
