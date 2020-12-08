@@ -411,6 +411,7 @@ public class GameHelper : MonoBehaviour
 
     IEnumerator WaitClosedGate()
     {
+        isPlayGame = false;
         yield return new WaitForSeconds(timerCoroutine);
         StopGame();
     }

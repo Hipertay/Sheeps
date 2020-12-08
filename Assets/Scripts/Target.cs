@@ -213,16 +213,13 @@ public class Target : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (!isAction)
+        if (touch)
         {
-            if (touch)
+            if (collision.gameObject.CompareTag("Ground"))
             {
-                if (collision.gameObject.CompareTag("Ground"))
-                {
-                    if (gravitation) rigidbody.useGravity = true;
-                    Agent.enabled = true;
-                    flyobject = false;
-                }
+                if (gravitation) rigidbody.useGravity = true;
+                Agent.enabled = true;
+                flyobject = false;
             }
         }
     }
