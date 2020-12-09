@@ -34,11 +34,14 @@ public class Target : MonoBehaviour
     Vector3 scale;
     bool isPosition;
 
+    Vector3 startScale = Vector3.zero;
+
 
     public NavMeshAgent Agent { get; private set; }
     // Start is called before the first frame update
     void Start()
     {
+        startScale = transform.localScale;
         isPosition = false;
         touch = false;
         flyobject = false;
@@ -48,6 +51,16 @@ public class Target : MonoBehaviour
         animator = GetComponent<Animator>();
         gameHelper = FindObjectOfType<GameHelper>();
         rigidbody = GetComponent<Rigidbody>();
+    }
+
+    private void OnEnable()
+    {
+        if(startScale != Vector3.zero)
+        {
+            transform.localScale = startScale;
+            Agent.enabled = true;
+            isAction = false;
+        }
     }
 
     // Update is called once per frame
@@ -137,7 +150,7 @@ public class Target : MonoBehaviour
     {
         isAction = true;
         animator.SetInteger("animation", 0);
-        Agent.enabled = false;
+        
         //rigidbody.isKinematic = true;
         switch (typeAction)
         {
@@ -155,6 +168,7 @@ public class Target : MonoBehaviour
                 StartCoroutine(Wait());
                 break;
         }
+        Agent.enabled = false;
     }
 
     IEnumerator ScaleTarget(GameObject gameObject)
@@ -215,7 +229,7 @@ public class Target : MonoBehaviour
     {
         if (touch)
         {
-            if (collision.gameObject.CompareTag("Ground"))
+            if (collision.gameObject.CompareTag("Ground") & !isAction)
             {
                 if (gravitation) rigidbody.useGravity = true;
                 Agent.enabled = true;

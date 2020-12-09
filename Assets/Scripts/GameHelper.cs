@@ -76,6 +76,7 @@ public class GameHelper : MonoBehaviour
     public float _timeToMaxStar = 0.5f;
     public float _timeToNormalStar = 0.5f;
     public float _scaleMaxStar = 1.1f;
+    GameObject ob;
 
 
     private void Awake()
@@ -87,10 +88,6 @@ public class GameHelper : MonoBehaviour
         objectPool = GetComponent<GameObjectPool>();
         meshpasture = pasture.GetComponent<MeshFilter>();
 
-    }
-
-    private void Start()
-    {
         stars = 3;
         gateAnimator.SetBool("isOpened", false);
 
@@ -100,6 +97,41 @@ public class GameHelper : MonoBehaviour
         stageText.text = levelHelper.stages[0].stageID.ToString();
         coralSizeText.text = levelHelper.stages[0].coralSize.ToString();
         slider.maxValue = levelHelper.stages.Length;
+
+        //objectPool.caches.Clear();
+        isPlayGame = false;
+        squareTargets = 0;
+        folow = false;
+        if (targetSpawned.Count != 0)
+        {
+            /*for (int i = 0; i < targetSpawned.Count; i++)
+            {
+                if (targetSpawned[i].gameObject != null)
+                    GameObjectPool.Unspawn(targetSpawned[i].gameObject);
+            }*/
+            //targetSpawned.Clear();
+            //targets.Clear();
+        }
+
+        levelID = levelHelper.levelID;
+
+        LoadStage(stageID);
+
+        /*if (spawnInStartGame)
+        {
+            for (int i = 0; i < objectPool.caches.Count; i++)
+            {
+                GameObject ob = GameObjectPool.Spawn(objectPool.caches[i].prefab, GetRandomPos(pasture, meshpasture), Quaternion.Euler(0f, Random.Range(0, 360f), 0f));
+                targetSpawned.Add(ob);
+                spawnTarget++;
+            }
+        }*/
+
+    }
+
+    private void Start()
+    {
+       
         StartCoroutine(WaitDrawUI(panelStage));
 
     }
@@ -159,7 +191,6 @@ public class GameHelper : MonoBehaviour
 
                     for (int t = 0; t < spawnTargetOneMoument; t++)
                     {
-                        GameObject ob = new GameObject();
                         int rnd = Random.Range(0, 100);
                         if (rnd < percentSpawnExplosion)
                         {
@@ -199,8 +230,8 @@ public class GameHelper : MonoBehaviour
                             }
                         }
                         NavMeshAgent navMeshAgent = ob.GetComponent<NavMeshAgent>();
+                        navMeshAgent.enabled = true;
                         navMeshAgent.SetDestination(GetRandomPos(cattleCorral, meshCattleCorral));
-                        //Debug.Log(navMeshAgent.gameObject.name);
                         Animator animator = ob.GetComponent<Animator>();
                         animator.SetInteger("animation", 1);
                         animator.speed = navMeshAgent.speed + ob.GetComponent<Target>().SpedAnimationTarget;
@@ -218,10 +249,15 @@ public class GameHelper : MonoBehaviour
 
     public void ButtonStartGame()
     {
-        objectPool.caches.Clear();
-        isPlayGame = false;
+       
+        StartCoroutine(WaitClosedUI(panelStage));
+        StartCoroutine(WaitStartGame());
+    }
+
+    public void NextStge()
+    {
         squareTargets = 0;
-        folow = false;
+        spawnTarget = 0;
         if (targetSpawned.Count != 0)
         {
             for (int i = 0; i < targetSpawned.Count; i++)
@@ -234,23 +270,6 @@ public class GameHelper : MonoBehaviour
         }
 
         levelID = levelHelper.levelID;
-
-        LoadStage(stageID);
-        StartCoroutine(WaitClosedUI(panelStage));
-        if (spawnInStartGame)
-        {
-            for (int i = 0; i < objectPool.caches.Count; i++)
-            {
-                GameObject ob = GameObjectPool.Spawn(objectPool.caches[i].prefab, GetRandomPos(pasture, meshpasture), Quaternion.Euler(0f, Random.Range(0, 360f), 0f));
-                targetSpawned.Add(ob);
-                spawnTarget++;
-            }
-        }
-        StartCoroutine(WaitStartGame());
-    }
-
-    public void NextStge()
-    {
         if (stageID != levelHelper.stages.Length)
         {
             stageID += 1;
@@ -275,10 +294,9 @@ public class GameHelper : MonoBehaviour
 
     public void LoadStage(int stage)
     {
-
+        GameObjectPool.ObjectCache oc;
         for (int i = 0; i < levelHelper.stages.Length; i++)
         {
-
             if (levelHelper.stages[i].stageID == stage)
             {
                 int task = 0;
@@ -303,7 +321,8 @@ public class GameHelper : MonoBehaviour
 
                 for (int o = 0; o < levelHelper.stages[i].tasks[task].targets.Length; o++)
                 {
-                    GameObjectPool.ObjectCache oc = new GameObjectPool.ObjectCache();
+                    
+                    oc = new GameObjectPool.ObjectCache();
                     oc.prefab = levelHelper.stages[i].tasks[task].targets[o].prefab;
                     oc.cacheSize = levelHelper.stages[i].tasks[task].targets[o].cacheSize;
                     oc.typeAction = levelHelper.stages[i].tasks[task].targets[o].typeAction;
@@ -313,9 +332,10 @@ public class GameHelper : MonoBehaviour
                     oc.scaledPower = levelHelper.stages[i].tasks[task].targets[o].scaledPower;
                     objectPool.caches.Add(oc);
                 }
+                break;
             }
         }
-        for (int i = 0; i < objectPool.caches.Count; i++)
+        //for (int i = 0; i < objectPool.caches.Count; i++)
         {
             objectPool.OnInitialized();
         }
@@ -495,6 +515,9 @@ public class GameHelper : MonoBehaviour
     public void Restart()
     {
 
+        spawnTarget = 0;
+        levelID = levelHelper.levelID;
+
         if (panelRestart.activeSelf)
         {
             StartCoroutine(WaitClosedUI(panelRestart));
@@ -507,8 +530,25 @@ public class GameHelper : MonoBehaviour
         {
             StartCoroutine(WaitClosedUI(panelEndGameWin));
         }
+        slider.value = 0f;
+        stageID = levelHelper.stages[0].stageID;
+        stageText.text = levelHelper.stages[0].stageID.ToString();
+        coralSizeText.text = levelHelper.stages[0].coralSize.ToString();
+        slider.maxValue = levelHelper.stages.Length;
 
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-
+        isPlayGame = false;
+        squareTargets = 0;
+        folow = false;
+        if (targetSpawned.Count != 0)
+        {
+            for (int i = 0; i < targetSpawned.Count; i++)
+            {
+                if (targetSpawned[i].gameObject != null)
+                    GameObjectPool.Unspawn(targetSpawned[i].gameObject);
+            }
+            targetSpawned.Clear();
+            targets.Clear();
+        }
+        StartCoroutine(WaitDrawUI(panelStage));
     }
 }

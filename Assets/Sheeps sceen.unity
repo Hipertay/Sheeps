@@ -4838,28 +4838,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d36a60a15d879f44b5e8b4013fc49b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  caches:
-  - prefab: {fileID: 1711576269369834, guid: c6e771987221ce843a041fa97e7f0a53, type: 3}
-    cacheSize: 100
-    typeAction: 0
-    square: 1
-    scaledPower: 3
-    minSpedTarget: 50
-    maxSpedTarget: 50
-  - prefab: {fileID: 1711576269369834, guid: c6e771987221ce843a041fa97e7f0a53, type: 3}
-    cacheSize: 100
-    typeAction: 0
-    square: 1
-    scaledPower: 1.5
-    minSpedTarget: 50
-    maxSpedTarget: 50
-  - prefab: {fileID: 1711576269369834, guid: c6e771987221ce843a041fa97e7f0a53, type: 3}
-    cacheSize: 100
-    typeAction: 0
-    square: 1
-    scaledPower: 3
-    minSpedTarget: 50
-    maxSpedTarget: 50
+  caches: []
 --- !u!114 &811960013
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6291,7 +6270,7 @@ MonoBehaviour:
       targets:
       - prefab: {fileID: 1711576269369834, guid: c6e771987221ce843a041fa97e7f0a53,
           type: 3}
-        cacheSize: 100
+        cacheSize: 300
         typeAction: 1
         square: 0.5
         scaledPower: 1.5
@@ -6299,7 +6278,7 @@ MonoBehaviour:
         maxSpedTarget: 2
       - prefab: {fileID: 1910410527260508, guid: 85919e30b1758094eb565a9294ca6d91,
           type: 3}
-        cacheSize: 100
+        cacheSize: 300
         typeAction: 0
         square: 2
         scaledPower: 2.5
@@ -6307,7 +6286,7 @@ MonoBehaviour:
         maxSpedTarget: 2
       - prefab: {fileID: 1524351440229938, guid: 89c91b2e87f45d040af746a3addf0aaa,
           type: 3}
-        cacheSize: 100
+        cacheSize: 300
         typeAction: 2
         square: 0
         scaledPower: 0
