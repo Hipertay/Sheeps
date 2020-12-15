@@ -12,7 +12,8 @@ public class Target : MonoBehaviour
     public float scaledPower;           //кратность увеличения/уменьшения
     public float minSpedTarget;       //скорость персонажа min
     public float maxSpedTarget;       //скорость персонажа max
-    public float SpedAnimationTarget; //скорость анимации персонажа
+    public float spedTargetOnCloseGate;       //скорость персонажа после закрытия ворот
+    public float spedAnimationTarget; //скорость анимации персонажа
     public float spedRotation;        //скорость поворота
     public float minPositionFly;       // min прыжок
     public float maxPositionFly;       // max прыжок
@@ -33,6 +34,9 @@ public class Target : MonoBehaviour
     Vector3 randomPosition;
     Vector3 scale;
     bool isPosition;
+    bool inGate;
+    GameObject pasture;
+    MeshFilter meshpasture;
 
     Vector3 startScale = Vector3.zero;
 
@@ -42,6 +46,7 @@ public class Target : MonoBehaviour
     void Start()
     {
         startScale = transform.localScale;
+        inGate = false;
         isPosition = false;
         touch = false;
         flyobject = false;
@@ -67,13 +72,13 @@ public class Target : MonoBehaviour
     void Update()
     {
 
-        var look = Quaternion.LookRotation(randomPosition - transform.position);
-        transform.rotation = Quaternion.Lerp(transform.rotation, look, spedRotation * Time.deltaTime);
-        if(isAction)
-        {
-            transform.eulerAngles = new Vector3(0f, transform.eulerAngles.y, 0f);
-        }
-        var heading = randomPosition - transform.position;
+        //var look = Quaternion.LookRotation(randomPosition - transform.position);
+        //transform.rotation = Quaternion.Lerp(transform.rotation, look, spedRotation * Time.deltaTime);
+        //if(isAction)
+        //{
+        //    transform.eulerAngles = new Vector3(0f, transform.eulerAngles.y, 0f);
+        //}
+        //var heading = randomPosition - transform.position;
 
         if (!touch)
         {
@@ -127,7 +132,7 @@ public class Target : MonoBehaviour
             }
 
             animator.SetInteger("animation", 1);
-            animator.speed = Agent.speed + SpedAnimationTarget;
+            animator.speed = Agent.speed + spedAnimationTarget;
         }
         else
         {
@@ -139,9 +144,25 @@ public class Target : MonoBehaviour
 
     public void Stay()
     {
-        animator.SetInteger("animation", 0);
-        if (Agent.enabled)
-            Agent.isStopped = true;
+        if (inGate)
+        {
+            animator.SetInteger("animation", 0);
+            if (Agent.enabled)
+                Agent.isStopped = true;
+        }
+        else
+        {
+            if (Agent.enabled)
+            {
+                Agent.SetDestination(gameHelper.GetRandomPos(pasture, meshpasture));
+                Agent.isStopped = false;
+            }
+
+            animator.SetInteger("animation", 1);
+            Agent.speed = spedTargetOnCloseGate;
+            animator.speed = Agent.speed + spedAnimationTarget;
+        }
+       
     }
 
     bool isAction = false;
@@ -198,10 +219,17 @@ public class Target : MonoBehaviour
         return sersh.gameObject;
     }
 
+    public void SetPasture(GameObject ob, MeshFilter mesh)
+    {
+        pasture = ob;
+        meshpasture = mesh;
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Gate"))
         {
+            inGate = true;
             gameHelper.targets.Add(this.gameObject.GetComponent<Target>());
             Folov();
         }
@@ -229,7 +257,7 @@ public class Target : MonoBehaviour
     {
         if (touch)
         {
-            if (collision.gameObject.CompareTag("Ground") & !isAction)
+            if (collision.gameObject.CompareTag("Ground") & isAction)
             {
                 if (gravitation) rigidbody.useGravity = true;
                 Agent.enabled = true;

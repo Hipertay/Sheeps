@@ -485,7 +485,7 @@ NavMeshAgent:
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 150
-  m_StoppingDistance: 1
+  m_StoppingDistance: 0.1
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
   m_AutoRepath: 1
@@ -510,10 +510,11 @@ MonoBehaviour:
   scaledPower: 0
   minSpedTarget: 0.5
   maxSpedTarget: 1
-  SpedAnimationTarget: 1.5
+  spedTargetOnCloseGate: 0.3
+  spedAnimationTarget: 0
   spedRotation: 5
-  minPositionFly: 7
-  maxPositionFly: 7
+  minPositionFly: 10
+  maxPositionFly: 10
   timeCourotine: 0
   skinnedMesh: {fileID: 137979296400250712}
   prefabParticle: {fileID: 193692, guid: 2aa1e7c21640d254492fa8035a6411e1, type: 3}
@@ -529,8 +530,8 @@ Rigidbody:
   m_GameObject: {fileID: 1524351440229938}
   serializedVersion: 2
   m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0
+  m_Drag: 1
+  m_AngularDrag: 1
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0

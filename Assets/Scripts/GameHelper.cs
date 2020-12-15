@@ -14,9 +14,9 @@ public enum TypeAction
 }
 public class GameHelper : MonoBehaviour
 {
-    public int levelID;
-    public int stageID;
-    public int stars;
+    private int levelID;
+    //private int stageID;
+    private int stars;
 
     public float percentWin;            //процент вместимости для победы
     public float timerCoroutine;        //время ожирания корутины
@@ -32,34 +32,37 @@ public class GameHelper : MonoBehaviour
     public int persecntToDestroy = 50;
 
 
-    public GameObject pasture;          // пастбище спавна Target
-    public Animator gateAnimator;       // аниматор забора
+    public GameObject background;
     public GameObject panelRestart;     // панель проигрыша
     public GameObject panelWin;         //панель победы
-    public GameObject panelStage;       //панель следующего стейджа
-    public GameObject panelEndGameWin;     //панель конца уровня
+    public bool dravTutorial;
+    public GameObject panelTutorial;       //панель следующего стейджа
+                                           // public GameObject panelEndGameWin;     //панель конца уровня
     public GameObject panelEndGameFail;  //панель конца уровня
+    public GameObject panelPRESS;
     public LevelHelper levelHelper;     //конструктор уровня
-    public Slider slider;
+                                        // public Slider slider;
+
+    Animator gateAnimator;
 
     public Text levelText;
-    public Text stageText;
-    public Text coralSizeText;
-    //public Text allStarsText;
-    //public Text starsText;
 
     public bool spawnInStartGame;        //создавать ли Target при старте
     private bool folow;                  // двигаемся?
     private bool isPlayGame = false;        // конец игры
 
-    public List<Сorral> corrals;
+    public Сorral corral;
+    public List<GameObject> gates;
+    public List<MeshFilter> pastures;
+
     public List<Target> targets;
     public List<GameObject> targetsKick;
 
 
-    private GameObject cattleCorral;
+    private List<GameObject> cattleCorral = new List<GameObject>();
     private float squareTargets;        //сумарная площадь Targets
-    private MeshFilter meshCattleCorral;
+    private List<MeshFilter> meshCattleCorral = new List<MeshFilter>();
+    private GameObject pasture;
     private MeshFilter meshpasture;
     private GameObjectPool objectPool;
     private int spawnTarget;
@@ -86,55 +89,39 @@ public class GameHelper : MonoBehaviour
         squareTargets = 0;
         folow = false;
         objectPool = GetComponent<GameObjectPool>();
-        meshpasture = pasture.GetComponent<MeshFilter>();
 
         stars = 3;
-        gateAnimator.SetBool("isOpened", false);
 
-        int IDLevel = PlayerPrefs.GetInt("Level") + 1;
-        levelText.text = IDLevel.ToString();
-        stageID = levelHelper.stages[0].stageID;
-        stageText.text = levelHelper.stages[0].stageID.ToString();
-        coralSizeText.text = levelHelper.stages[0].coralSize.ToString();
-        slider.maxValue = levelHelper.stages.Length;
-
-        //objectPool.caches.Clear();
-        isPlayGame = false;
-        squareTargets = 0;
-        folow = false;
-        if (targetSpawned.Count != 0)
+        for (int c = 0; c < gates.Count; c++)
         {
-            /*for (int i = 0; i < targetSpawned.Count; i++)
-            {
-                if (targetSpawned[i].gameObject != null)
-                    GameObjectPool.Unspawn(targetSpawned[i].gameObject);
-            }*/
-            //targetSpawned.Clear();
-            //targets.Clear();
+            gateAnimator = gates[c].GetComponent<Animator>();
+            gateAnimator.SetBool("isOpened", false);
         }
 
+        
+
+        isPlayGame = false;
+        squareTargets = 0;
+
         levelID = levelHelper.levelID;
+        levelText.text = SceneManager.GetActiveScene().buildIndex.ToString();
 
-        LoadStage(stageID);
-
-        /*if (spawnInStartGame)
-        {
-            for (int i = 0; i < objectPool.caches.Count; i++)
-            {
-                GameObject ob = GameObjectPool.Spawn(objectPool.caches[i].prefab, GetRandomPos(pasture, meshpasture), Quaternion.Euler(0f, Random.Range(0, 360f), 0f));
-                targetSpawned.Add(ob);
-                spawnTarget++;
-            }
-        }*/
+        LoadStage();
 
     }
 
     private void Start()
     {
-       
-        StartCoroutine(WaitDrawUI(panelStage));
+        if (dravTutorial)
+        {
+            background.SetActive(true);
+            StartCoroutine(WaitDrawUI(panelTutorial));
+        }
+        else { ButtonStartGame(); }
 
     }
+
+    int rndPartPlace;
 
     private void Update()
     {
@@ -146,19 +133,27 @@ public class GameHelper : MonoBehaviour
                 if (Input.GetTouch(i).phase == TouchPhase.Stationary || Input.GetTouch(i).phase == TouchPhase.Moved ||
                     Input.GetTouch(i).phase == TouchPhase.Began)
                 {
+                    panelPRESS.SetActive(false);
                     folow = true;
-                    if (!gateAnimator.GetBool("isOpened"))
+                    for (int c = 0; c < gates.Count; c++)
                     {
+                        gateAnimator = gates[c].GetComponent<Animator>();
                         gateAnimator.SetBool("isOpened", true);
                     }
+
+                    StartCoroutine(corral.StartNormalizer(false));
+
                 }
                 else if (Input.GetTouch(i).phase == TouchPhase.Ended)
                 {
                     folow = false;
-                    if (gateAnimator.GetBool("isOpened"))
+                    for (int c = 0; c < gates.Count; c++)
                     {
+                        gateAnimator = gates[c].GetComponent<Animator>();
                         gateAnimator.SetBool("isOpened", false);
                     }
+
+                    StartCoroutine(corral.StartNormalizer(true));
                     StartCoroutine(WaitClosedGate());
                 }
                 ++i;
@@ -167,18 +162,25 @@ public class GameHelper : MonoBehaviour
             if (Input.GetMouseButtonDown(0))
             {
                 folow = true;
-                if (!gateAnimator.GetBool("isOpened"))
+                panelPRESS.SetActive(false);
+                for (int c = 0; c < gates.Count; c++)
                 {
+                    gateAnimator = gates[c].GetComponent<Animator>();
                     gateAnimator.SetBool("isOpened", true);
                 }
+
+                StartCoroutine(corral.StartNormalizer(false));
             }
             else if (Input.GetMouseButtonUp(0))
             {
                 folow = false;
-                if (gateAnimator.GetBool("isOpened"))
+                for (int c = 0; c < gates.Count; c++)
                 {
+                    gateAnimator = gates[c].GetComponent<Animator>();
                     gateAnimator.SetBool("isOpened", false);
                 }
+
+                StartCoroutine(corral.StartNormalizer(true));
                 StartCoroutine(WaitClosedGate());
             }
 #endif
@@ -191,6 +193,10 @@ public class GameHelper : MonoBehaviour
 
                     for (int t = 0; t < spawnTargetOneMoument; t++)
                     {
+                        int rndPast = Random.Range(0, pastures.Count);
+                        pasture = pastures[rndPast].gameObject;
+                        meshpasture = pastures[rndPast];
+
                         int rnd = Random.Range(0, 100);
                         if (rnd < percentSpawnExplosion)
                         {
@@ -230,11 +236,14 @@ public class GameHelper : MonoBehaviour
                             }
                         }
                         NavMeshAgent navMeshAgent = ob.GetComponent<NavMeshAgent>();
+                        Target target = ob.GetComponent<Target>();
                         navMeshAgent.enabled = true;
-                        navMeshAgent.SetDestination(GetRandomPos(cattleCorral, meshCattleCorral));
+                        rndPartPlace = Random.Range(0, cattleCorral.Count);
+                        navMeshAgent.SetDestination(GetRandomPos(cattleCorral[rndPartPlace], meshCattleCorral[rndPartPlace]));
                         Animator animator = ob.GetComponent<Animator>();
                         animator.SetInteger("animation", 1);
-                        animator.speed = navMeshAgent.speed + ob.GetComponent<Target>().SpedAnimationTarget;
+                        animator.speed = navMeshAgent.speed + target.spedAnimationTarget;
+                        target.SetPasture(pasture, meshpasture);
                         targetSpawned.Add(ob);
                         secondgametime = 0;
                         spawnTarget++;
@@ -249,8 +258,15 @@ public class GameHelper : MonoBehaviour
 
     public void ButtonStartGame()
     {
-       
-        StartCoroutine(WaitClosedUI(panelStage));
+
+        if (dravTutorial)
+        {
+
+            StartCoroutine(WaitClosedUI(panelTutorial));
+            background.SetActive(false);
+            dravTutorial = false;
+        }
+        panelPRESS.SetActive(true);
         StartCoroutine(WaitStartGame());
     }
 
@@ -270,75 +286,49 @@ public class GameHelper : MonoBehaviour
         }
 
         levelID = levelHelper.levelID;
-        if (stageID != levelHelper.stages.Length)
-        {
-            stageID += 1;
-            for (int i = 0; i < levelHelper.stages.Length; i++)
-            {
-                if (levelHelper.stages[i].stageID == stageID)
-                {
-                    float temp = levelHelper.stages[i].coralSize;
-                    stageText.text = levelHelper.stages[i].stageID.ToString();
-                    coralSizeText.text = levelHelper.stages[i].coralSize.ToString();
-                }
-            }
-            StartCoroutine(WaitDrawUI(panelStage));
-        }
-        else
-        {
-            //allStarsText.text = stars.ToString();
-            StartCoroutine(WaitDrawUI(panelEndGameWin));
-        }
+        if (dravTutorial) StartCoroutine(WaitDrawUI(panelTutorial));
+        else { ButtonStartGame(); }
+
         StartCoroutine(WaitClosedUI(panelWin));
     }
 
-    public void LoadStage(int stage)
+    public void LoadStage()
     {
         GameObjectPool.ObjectCache oc;
-        for (int i = 0; i < levelHelper.stages.Length; i++)
+
+        int task = 0;
+
+        cattleCorral = corral.cattleCorral;
+        meshCattleCorral = corral.meshCattleCorral;
+        VerticeList = new List<Vector3>(meshCattleCorral[rndPartPlace].sharedMesh.vertices);
+
+
+        if (levelHelper.randomTask) task = Random.Range(0, levelHelper.tasks.Length);
+        else
         {
-            if (levelHelper.stages[i].stageID == stage)
+            for (int t = 0; t < levelHelper.tasks.Length; t++)
             {
-                int task = 0;
-                for (int c = 0; c < corrals.Count; c++)
-                {
-                    if (corrals[c].coralID == levelHelper.stages[i].coralID)
-                    {
-                        cattleCorral = corrals[c].cattleCorral;
-                        meshCattleCorral = corrals[c].meshCattleCorral;
-                        VerticeList = new List<Vector3>(meshCattleCorral.sharedMesh.vertices);
-                    }
-                }
-
-                if (levelHelper.stages[i].randomTask) task = Random.Range(0, levelHelper.stages[i].tasks.Length);
-                else
-                {
-                    for (int t = 0; t < levelHelper.stages[i].tasks.Length; t++)
-                    {
-                        if (levelHelper.stages[i].tasks[t].taskID == t) task = t;
-                    }
-                }
-
-                for (int o = 0; o < levelHelper.stages[i].tasks[task].targets.Length; o++)
-                {
-                    
-                    oc = new GameObjectPool.ObjectCache();
-                    oc.prefab = levelHelper.stages[i].tasks[task].targets[o].prefab;
-                    oc.cacheSize = levelHelper.stages[i].tasks[task].targets[o].cacheSize;
-                    oc.typeAction = levelHelper.stages[i].tasks[task].targets[o].typeAction;
-                    oc.square = levelHelper.stages[i].tasks[task].targets[o].square;
-                    oc.minSpedTarget = levelHelper.stages[i].tasks[task].targets[o].minSpedTarget;
-                    oc.maxSpedTarget = levelHelper.stages[i].tasks[task].targets[o].maxSpedTarget;
-                    oc.scaledPower = levelHelper.stages[i].tasks[task].targets[o].scaledPower;
-                    objectPool.caches.Add(oc);
-                }
-                break;
+                if (levelHelper.tasks[t].taskID == t) task = t;
             }
         }
-        //for (int i = 0; i < objectPool.caches.Count; i++)
+
+        for (int o = 0; o < levelHelper.tasks[task].targets.Length; o++)
         {
-            objectPool.OnInitialized();
+
+            oc = new GameObjectPool.ObjectCache();
+            oc.prefab = levelHelper.tasks[task].targets[o].prefab;
+            oc.cacheSize = levelHelper.tasks[task].targets[o].cacheSize;
+            oc.typeAction = levelHelper.tasks[task].targets[o].typeAction;
+            oc.square = levelHelper.tasks[task].targets[o].square;
+            oc.minSpedTarget = levelHelper.tasks[task].targets[o].minSpedTarget;
+            oc.maxSpedTarget = levelHelper.tasks[task].targets[o].maxSpedTarget;
+            oc.scaledPower = levelHelper.tasks[task].targets[o].scaledPower;
+            objectPool.caches.Add(oc);
         }
+
+
+        objectPool.OnInitialized();
+
 
     }
 
@@ -346,11 +336,11 @@ public class GameHelper : MonoBehaviour
     {
         float squareTemp = 0f;
 
-        for(int i = 0; i < targetsKick.Count; i++)
+        for (int i = 0; i < targetsKick.Count; i++)
         {
-            if(i < maxKick)
+            if (i < maxKick)
             {
-                if(Random.Range(0, 100) < persecntToDestroy)
+                if (Random.Range(0, 100) < persecntToDestroy)
                 {
                     //Debug.Log("Unspawn " + targetsKick[i].name);
                     targets.Remove(targetsKick[i].GetComponent<Target>());
@@ -367,20 +357,14 @@ public class GameHelper : MonoBehaviour
             }
             target.Action();
         }
-       
+
         squareTemp = squareTargets;
-        for (int i = 0; i < levelHelper.stages.Length; i++)
+        while (squareTemp > levelHelper.coralSize)
         {
-            if (levelHelper.stages[i].stageID == stageID)
-            {
-                while (squareTemp > levelHelper.stages[i].coralSize)
-                {
-                    int t = Random.Range(0, targets.Count);
-                    squareTemp -= targets[t].square;
-                    targets[t].KickOut();
-                    targets.RemoveAt(t);
-                }
-            }
+            int t = Random.Range(0, targets.Count);
+            squareTemp -= targets[t].square;
+            targets[t].KickOut();
+            targets.RemoveAt(t);
         }
         StartCoroutine(WaitEndGame());
     }
@@ -391,36 +375,25 @@ public class GameHelper : MonoBehaviour
 
         yield return new WaitForSeconds(waitEndGame);
 
-        for (int i = 0; i < levelHelper.stages.Length; i++)
+        float temp = levelHelper.coralSize * percentWin;
+        float percent = temp;
+
+        if (squareTargets >= percent && squareTargets <= levelHelper.coralSize)
         {
-            if (levelHelper.stages[i].stageID == stageID)
+            if (PlayerPrefs.GetInt("Level") <= levelID)
             {
-                float temp = levelHelper.stages[i].coralSize * percentWin;
-                float percent = temp;
-
-                if (squareTargets >= percent && squareTargets <= levelHelper.stages[i].coralSize)
-                {
-
-                    if (i != levelHelper.stages.Length)
-                    {
-                        //starsText.text = stars.ToString();
-                        StartCoroutine(WaitDrawUI(panelWin));
-                    }
-                    else
-                    {
-                        //allStarsText.text = stars.ToString();
-                        StartCoroutine(WaitDrawUI(panelEndGameWin));
-                    }
-                    slider.value = stageID;
-                }
-                else
-                {
-                    StartCoroutine(WaitDrawUI(panelRestart));
-                }
-                isPlayGame = false;
-                break;
+                PlayerPrefs.SetInt("Level", PlayerPrefs.GetInt("Level") + 1);
+                PlayerPrefs.Save();
             }
+
+            StartCoroutine(WaitDrawUI(panelWin));
+
         }
+        else
+        {
+            StartCoroutine(WaitDrawUI(panelRestart));
+        }
+        isPlayGame = false;
     }
 
     IEnumerator WaitStartGame()
@@ -453,19 +426,6 @@ public class GameHelper : MonoBehaviour
                 _allStars[i].transform.DOScale(_scaleMaxStar, _timeToMaxStar);
                 yield return new WaitForSeconds(_timeToMaxStar);
                 _allStars[i].transform.DOScale(1f, _timeToNormalStar);
-                yield return new WaitForSeconds(_timeToNormalStar);
-            }
-        }
-        if (gameObject == panelEndGameWin)
-        {
-            PlayerPrefs.SetInt("Level", PlayerPrefs.GetInt("Level") + 1);
-            PlayerPrefs.Save();
-            for (int i = 0; i < _allStarsEnd.Count; i++)
-            {
-                yield return new WaitForSeconds(_delayBetweenStars);
-                _allStarsEnd[i].transform.DOScale(_scaleMaxStar, _timeToMaxStar);
-                yield return new WaitForSeconds(_timeToMaxStar);
-                _allStarsEnd[i].transform.DOScale(1f, _timeToNormalStar);
                 yield return new WaitForSeconds(_timeToNormalStar);
             }
         }
@@ -502,7 +462,7 @@ public class GameHelper : MonoBehaviour
             index = VerticeList.Count - intexTemp;
             index -= 1;
         }
-        Vector3 RndPointonPlane = cattleCorral.transform.TransformPoint(VerticeList[index]);
+        Vector3 RndPointonPlane = cattleCorral[rndPartPlace].transform.TransformPoint(VerticeList[index]);
         inverse = !inverse;
         intexTemp++;
         if (intexTemp >= VerticeList.Count)
@@ -512,11 +472,17 @@ public class GameHelper : MonoBehaviour
         return RndPointonPlane;
     }
 
+    public void StartNextLevel()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+    }
+
     public void Restart()
     {
 
         spawnTarget = 0;
         levelID = levelHelper.levelID;
+
 
         if (panelRestart.activeSelf)
         {
@@ -526,15 +492,6 @@ public class GameHelper : MonoBehaviour
         {
             StartCoroutine(WaitClosedUI(panelWin));
         }
-        else if (panelEndGameWin.activeSelf)
-        {
-            StartCoroutine(WaitClosedUI(panelEndGameWin));
-        }
-        slider.value = 0f;
-        stageID = levelHelper.stages[0].stageID;
-        stageText.text = levelHelper.stages[0].stageID.ToString();
-        coralSizeText.text = levelHelper.stages[0].coralSize.ToString();
-        slider.maxValue = levelHelper.stages.Length;
 
         isPlayGame = false;
         squareTargets = 0;
@@ -549,6 +506,8 @@ public class GameHelper : MonoBehaviour
             targetSpawned.Clear();
             targets.Clear();
         }
-        StartCoroutine(WaitDrawUI(panelStage));
+
+        if (dravTutorial) StartCoroutine(WaitDrawUI(panelTutorial));
+        else { ButtonStartGame(); }
     }
 }

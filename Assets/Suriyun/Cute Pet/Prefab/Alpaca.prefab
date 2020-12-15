@@ -434,10 +434,10 @@ GameObject:
   - component: {fileID: 4305279730205268}
   - component: {fileID: 95486552707986800}
   - component: {fileID: 8989382080608110119}
-  - component: {fileID: 4103146075989267803}
   - component: {fileID: -7637780985230402118}
-  - component: {fileID: 6866985421580946580}
   - component: {fileID: 2527842213272490064}
+  - component: {fileID: -1339529446484253103}
+  - component: {fileID: -1957203944966283417}
   m_Layer: 8
   m_Name: Alpaca
   m_TagString: Untagged
@@ -502,29 +502,6 @@ NavMeshAgent:
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 0
---- !u!114 &4103146075989267803
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1244936432145580}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 09160c0f4804ca748a8152e773e760f9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  flyobject: 0
-  square: 1
-  scaledPower: 2
-  minSpedTarget: 0.5
-  maxSpedTarget: 1
-  SpedAnimationTarget: 1.5
-  spedRotation: 5
-  minPositionFly: -10
-  maxPositionFly: 15
-  gravitation: 0
-  updatePosition: 1
 --- !u!54 &-7637780985230402118
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -541,20 +518,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!136 &6866985421580946580
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1244936432145580}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  m_Radius: 0.07866071
-  m_Height: 0.3875057
-  m_Direction: 1
-  m_Center: {x: 0.0015598685, y: 0.15, z: 0}
 --- !u!208 &2527842213272490064
 NavMeshObstacle:
   m_ObjectHideFlags: 0
@@ -571,6 +534,47 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 1
   m_Center: {x: 0, y: 0.15, z: 0}
   m_TimeToStationary: 0.5
+--- !u!114 &-1339529446484253103
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1244936432145580}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 09160c0f4804ca748a8152e773e760f9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  typeAction: 1
+  square: 1
+  scaledPower: 1.5
+  minSpedTarget: 0.5
+  maxSpedTarget: 1
+  spedTargetOnCloseGate: 0.3
+  spedAnimationTarget: 0
+  spedRotation: 5
+  minPositionFly: 7
+  maxPositionFly: 7
+  timeCourotine: 0.5
+  skinnedMesh: {fileID: 0}
+  prefabParticle: {fileID: 0}
+  updatePosition: 1
+  gravitation: 0
+  flyobject: 0
+--- !u!65 &-1957203944966283417
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1244936432145580}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.104056984, y: 0.21279562, z: 0.14758472}
+  m_Center: {x: 0.00016415119, y: 0.10317317, z: 0.019848444}
 --- !u!1 &1268956804963694
 GameObject:
   m_ObjectHideFlags: 0
