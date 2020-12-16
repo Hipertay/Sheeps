@@ -109,7 +109,7 @@ NavMeshSettings:
   m_BuildSettings:
     serializedVersion: 2
     agentTypeID: 0
-    agentRadius: 0.1
+    agentRadius: 0.15
     agentHeight: 3.12
     agentSlope: 23.8
     agentClimb: 0.04
@@ -117,7 +117,7 @@ NavMeshSettings:
     maxJumpAcrossDistance: 0
     minRegionArea: 2
     manualCellSize: 0
-    cellSize: 0.033333335
+    cellSize: 0.05
     manualTileSize: 0
     tileSize: 256
     accuratePlacement: 0
@@ -125,7 +125,7 @@ NavMeshSettings:
     preserveTilesOutsideBounds: 0
     debug:
       m_Flags: 0
-  m_NavMeshData: {fileID: 23800000, guid: 903dc05f845fbf14eaa685c15217f127, type: 2}
+  m_NavMeshData: {fileID: 23800000, guid: 693ffb5163b162a46a3501ab162ee53c, type: 2}
 --- !u!1001 &6590974
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1757,7 +1757,7 @@ Transform:
   m_GameObject: {fileID: 234580550}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0.75399977, y: -0.35517153, z: 0.952}
-  m_LocalScale: {x: 0.15, y: 0.96124727, z: 0.15}
+  m_LocalScale: {x: 0.12660939, y: 0.96124727, z: 0.114632815}
   m_Children:
   - {fileID: 1075854782}
   m_Father: {fileID: 1178320073}
@@ -5789,7 +5789,7 @@ Transform:
   m_GameObject: {fileID: 890824507}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 2.253, y: -0.35517153, z: -0.552}
-  m_LocalScale: {x: 0.15, y: 0.96124727, z: 0.15}
+  m_LocalScale: {x: 0.12660939, y: 0.96124727, z: 0.114632815}
   m_Children:
   - {fileID: 368092146}
   m_Father: {fileID: 1178320073}
@@ -6857,31 +6857,31 @@ MonoBehaviour:
   levelID: 3
   taskID: 0
   randomTask: 0
-  coralSize: 75
+  coralSize: 30
   tasks:
   - taskID: 0
     corralID: 0
     targets:
     - prefab: {fileID: 1711576269369834, guid: c6e771987221ce843a041fa97e7f0a53, type: 3}
       cacheSize: 100
-      typeAction: 1
+      typeAction: 0
       square: 1
-      scaledPower: 1.5
-      minSpedTarget: 2
+      scaledPower: 2
+      minSpedTarget: 1.5
       maxSpedTarget: 2
     - prefab: {fileID: 1910410527260508, guid: 85919e30b1758094eb565a9294ca6d91, type: 3}
       cacheSize: 100
       typeAction: 0
       square: 1
-      scaledPower: 2.5
-      minSpedTarget: 2
+      scaledPower: 2
+      minSpedTarget: 1.5
       maxSpedTarget: 2
     - prefab: {fileID: 1524351440229938, guid: 89c91b2e87f45d040af746a3addf0aaa, type: 3}
       cacheSize: 100
       typeAction: 2
       square: 1
-      scaledPower: 2.5
-      minSpedTarget: 2
+      scaledPower: 2
+      minSpedTarget: 1.5
       maxSpedTarget: 2
 --- !u!4 &983397591
 Transform:
@@ -13479,7 +13479,7 @@ Transform:
   m_GameObject: {fileID: 1784588866}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0.75399977, y: -0.35517153, z: -0.552}
-  m_LocalScale: {x: 0.15, y: 0.96124727, z: 0.15}
+  m_LocalScale: {x: 0.121861525, y: 0.96124727, z: 0.114632815}
   m_Children:
   - {fileID: 1991087796}
   m_Father: {fileID: 1178320073}
@@ -14897,7 +14897,7 @@ Transform:
   m_GameObject: {fileID: 1931983792}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 2.2529998, y: -0.35517153, z: 0.952}
-  m_LocalScale: {x: 0.15, y: 0.96124727, z: 0.15}
+  m_LocalScale: {x: 0.12660939, y: 0.96124727, z: 0.114632815}
   m_Children:
   - {fileID: 1580916102}
   m_Father: {fileID: 1178320073}

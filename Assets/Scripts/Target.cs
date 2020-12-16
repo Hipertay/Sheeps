@@ -62,6 +62,7 @@ public class Target : MonoBehaviour
     {
         if(startScale != Vector3.zero)
         {
+            Agent.speed = Random.Range(minSpedTarget, maxSpedTarget);
             transform.localScale = startScale;
             Agent.enabled = true;
             isAction = false;
@@ -155,14 +156,14 @@ public class Target : MonoBehaviour
             if (Agent.enabled)
             {
                 Agent.SetDestination(gameHelper.GetRandomPos(pasture, meshpasture));
-                Agent.isStopped = false;
+                
             }
 
             animator.SetInteger("animation", 1);
             Agent.speed = spedTargetOnCloseGate;
             animator.speed = Agent.speed + spedAnimationTarget;
         }
-       
+        Agent.speed = 0f;
     }
 
     bool isAction = false;
@@ -171,7 +172,7 @@ public class Target : MonoBehaviour
     {
         isAction = true;
         animator.SetInteger("animation", 0);
-        
+        Agent.speed = 0f;
         //rigidbody.isKinematic = true;
         switch (typeAction)
         {
@@ -196,7 +197,6 @@ public class Target : MonoBehaviour
     {
         gameObject.transform.DOScale(scale, timeCourotine);
         yield return new WaitForSeconds(timeCourotine);
-
     }
 
     IEnumerator Wait()
@@ -230,7 +230,8 @@ public class Target : MonoBehaviour
         if (other.CompareTag("Gate"))
         {
             inGate = true;
-            gameHelper.targets.Add(this.gameObject.GetComponent<Target>());
+            if (!gameHelper.targets.Contains(this.gameObject.GetComponent<Target>()))
+                gameHelper.targets.Add(this.gameObject.GetComponent<Target>());
             Folov();
         }
 

@@ -104,7 +104,7 @@ public class GameHelper : MonoBehaviour
         squareTargets = 0;
 
         levelID = levelHelper.levelID;
-        levelText.text = SceneManager.GetActiveScene().buildIndex.ToString();
+        levelText.text = (SceneManager.GetActiveScene().buildIndex + 1).ToString();
 
         LoadStage();
 
@@ -122,6 +122,7 @@ public class GameHelper : MonoBehaviour
     }
 
     int rndPartPlace;
+    List<NavMeshAgent> allSheeps = new List<NavMeshAgent>();
 
     private void Update()
     {
@@ -141,7 +142,7 @@ public class GameHelper : MonoBehaviour
                         gateAnimator.SetBool("isOpened", true);
                     }
 
-                    StartCoroutine(corral.StartNormalizer(false));
+                    //StartCoroutine(corral.StartNormalizer(false));
 
                 }
                 else if (Input.GetTouch(i).phase == TouchPhase.Ended)
@@ -153,7 +154,7 @@ public class GameHelper : MonoBehaviour
                         gateAnimator.SetBool("isOpened", false);
                     }
 
-                    StartCoroutine(corral.StartNormalizer(true));
+                    //StartCoroutine(corral.StartNormalizer(true));
                     StartCoroutine(WaitClosedGate());
                 }
                 ++i;
@@ -169,7 +170,7 @@ public class GameHelper : MonoBehaviour
                     gateAnimator.SetBool("isOpened", true);
                 }
 
-                StartCoroutine(corral.StartNormalizer(false));
+                //StartCoroutine(corral.StartNormalizer(false));
             }
             else if (Input.GetMouseButtonUp(0))
             {
@@ -180,8 +181,13 @@ public class GameHelper : MonoBehaviour
                     gateAnimator.SetBool("isOpened", false);
                 }
 
-                StartCoroutine(corral.StartNormalizer(true));
+                //StartCoroutine(corral.StartNormalizer(true));
                 StartCoroutine(WaitClosedGate());
+
+                for(int k = 0; k < allSheeps.Count; k++)
+                {
+                    allSheeps[k].speed = 0f;
+                }
             }
 #endif
 
@@ -211,7 +217,13 @@ public class GameHelper : MonoBehaviour
                         }
                         else
                         {
-                            int rnd_2 = Random.Range(0, 100 - (int)percentSpawnExplosion);
+                            x: int rndTemp = Random.Range(0, objectPool.caches.Count);
+                            if (objectPool.caches[rndTemp].typeAction != TypeAction.EXPLOSION)
+                            {
+                                ob = GameObjectPool.Spawn(objectPool.caches[rndTemp].prefab, GetRandomPos(pasture, meshpasture), Quaternion.Euler(0f, Random.Range(0, 360f), 0f));
+                            }
+                            else goto x;
+                            /*int rnd_2 = Random.Range(0, 100 - (int)percentSpawnExplosion);
                             if (rnd_2 < (100 - percentSpawnExplosion) / 2)
                             {
                                 for (int o = 0; o < objectPool.caches.Count; o++)
@@ -233,8 +245,9 @@ public class GameHelper : MonoBehaviour
                                         break;
                                     }
                                 }
-                            }
+                            }*/
                         }
+                        allSheeps.Add(ob.GetComponent<NavMeshAgent>());
                         NavMeshAgent navMeshAgent = ob.GetComponent<NavMeshAgent>();
                         Target target = ob.GetComponent<Target>();
                         navMeshAgent.enabled = true;
@@ -494,7 +507,7 @@ public class GameHelper : MonoBehaviour
         }
 
         isPlayGame = false;
-        squareTargets = 0;
+        
         folow = false;
         if (targetSpawned.Count != 0)
         {
@@ -509,5 +522,6 @@ public class GameHelper : MonoBehaviour
 
         if (dravTutorial) StartCoroutine(WaitDrawUI(panelTutorial));
         else { ButtonStartGame(); }
+        squareTargets = 0;
     }
 }
