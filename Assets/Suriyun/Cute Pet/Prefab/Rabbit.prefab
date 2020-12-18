@@ -126,7 +126,7 @@ MonoBehaviour:
   scaledPower: 1.5
   minSpedTarget: 0.5
   maxSpedTarget: 1
-  spedTargetOnCloseGate: 0.3
+  spedTargetOnCloseGate: 0
   spedAnimationTarget: 0
   spedRotation: 5
   minPositionFly: 7

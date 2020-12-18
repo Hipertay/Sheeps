@@ -184,6 +184,10 @@ public class Target : MonoBehaviour
                 scale = gameObject.transform.localScale / scaledPower;
                 StartCoroutine(ScaleTarget(gameObject));
                 break;
+            case TypeAction.SPECIAL:
+                scale = gameObject.transform.localScale * scaledPower;
+                StartCoroutine(ScaleTarget(gameObject));
+                break;
             case TypeAction.EXPLOSION:
                 GameObject particle = Instantiate(prefabParticle, transform.position, Quaternion.identity);
                 KickOut();
@@ -206,11 +210,10 @@ public class Target : MonoBehaviour
 
     public void KickOut()
     {
-            if (!gravitation) rigidbody.useGravity = false;
-            Agent.enabled = false;
-            flyobject = true;
-            rigidbody.AddRelativeForce(new Vector3(Random.Range(minPositionFly, maxPositionFly), Random.Range(minPositionFly, maxPositionFly), Random.Range(minPositionFly, maxPositionFly)), ForceMode.Impulse);
-        
+        if (!gravitation) rigidbody.useGravity = false;
+        Agent.enabled = false;
+        flyobject = true;
+        rigidbody.AddRelativeForce(new Vector3(Random.Range(minPositionFly, maxPositionFly), Random.Range(minPositionFly, maxPositionFly), Random.Range(minPositionFly, maxPositionFly)), ForceMode.Impulse);
     }
 
     public GameObject TargetSearch()

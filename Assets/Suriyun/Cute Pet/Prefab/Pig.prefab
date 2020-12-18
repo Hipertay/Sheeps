@@ -855,8 +855,8 @@ MonoBehaviour:
   spedTargetOnCloseGate: 0.3
   spedAnimationTarget: 0
   spedRotation: 5
-  minPositionFly: 7
-  maxPositionFly: 7
+  minPositionFly: 13
+  maxPositionFly: 13
   timeCourotine: 0.5
   skinnedMesh: {fileID: 0}
   prefabParticle: {fileID: 0}

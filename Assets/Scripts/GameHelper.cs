@@ -10,7 +10,8 @@ public enum TypeAction
 {
     INCREASE = 0,
     DECREASE = 1,
-    EXPLOSION = 2
+    EXPLOSION = 2,
+    SPECIAL = 3
 }
 public class GameHelper : MonoBehaviour
 {
@@ -24,6 +25,7 @@ public class GameHelper : MonoBehaviour
     public int maxSpawnTarget;         // максимальное кол-во Target
     public int spawnTargetOneMoument;   //кол-во объектов за один спавн
     public float percentSpawnExplosion;  //процент спавна
+    public float percentSpawnSpecial;
     public float _timeToNormal;          // время появления окна
     public float _tempScale;             // сила увеличения окна
     public float waitStartGame;          //ожидание старта после нажатия кнопки
@@ -123,6 +125,9 @@ public class GameHelper : MonoBehaviour
 
     int rndPartPlace;
     List<NavMeshAgent> allSheeps = new List<NavMeshAgent>();
+    NavMeshAgent navMeshAgent;
+    Target target;
+    Animator animator;
 
     private void Update()
     {
@@ -141,7 +146,7 @@ public class GameHelper : MonoBehaviour
                         gateAnimator = gates[c].GetComponent<Animator>();
                         gateAnimator.SetBool("isOpened", true);
                     }
-
+                    StartCoroutine(DelayBetweenGateAndSpawn());
                     //StartCoroutine(corral.StartNormalizer(false));
 
                 }
@@ -169,7 +174,7 @@ public class GameHelper : MonoBehaviour
                     gateAnimator = gates[c].GetComponent<Animator>();
                     gateAnimator.SetBool("isOpened", true);
                 }
-
+                StartCoroutine(DelayBetweenGateAndSpawn());
                 //StartCoroutine(corral.StartNormalizer(false));
             }
             else if (Input.GetMouseButtonUp(0))
@@ -180,7 +185,7 @@ public class GameHelper : MonoBehaviour
                     gateAnimator = gates[c].GetComponent<Animator>();
                     gateAnimator.SetBool("isOpened", false);
                 }
-
+                
                 //StartCoroutine(corral.StartNormalizer(true));
                 StartCoroutine(WaitClosedGate());
 
@@ -191,7 +196,7 @@ public class GameHelper : MonoBehaviour
             }
 #endif
 
-            if (folow && maxSpawnTarget > spawnTarget)
+            if (folow && maxSpawnTarget > spawnTarget & delayBetweenGateAndSpawn)
             {
                 secondgametime += Time.deltaTime;
                 if (secondgametime >= timerSpawnTarget)
@@ -203,8 +208,20 @@ public class GameHelper : MonoBehaviour
                         pasture = pastures[rndPast].gameObject;
                         meshpasture = pastures[rndPast];
 
-                        int rnd = Random.Range(0, 100);
-                        if (rnd < percentSpawnExplosion)
+                        int rndExplosion = Random.Range(0, 100);
+                        int rndSpecial = Random.Range(0, 100);
+                        if (rndSpecial < percentSpawnSpecial)
+                        {
+                            for (int o = 0; o < objectPool.caches.Count; o++)
+                            {
+                                if (objectPool.caches[o].typeAction == TypeAction.SPECIAL)
+                                {
+                                    ob = GameObjectPool.Spawn(objectPool.caches[o].prefab, GetRandomPos(pasture, meshpasture), Quaternion.Euler(0f, Random.Range(0, 360f), 0f));
+                                    break;
+                                }
+                            }
+                        }
+                        else if (rndExplosion < percentSpawnSpecial & rndExplosion < percentSpawnExplosion + percentSpawnSpecial)
                         {
                             for (int o = 0; o < objectPool.caches.Count; o++)
                             {
@@ -218,42 +235,19 @@ public class GameHelper : MonoBehaviour
                         else
                         {
                             x: int rndTemp = Random.Range(0, objectPool.caches.Count);
-                            if (objectPool.caches[rndTemp].typeAction != TypeAction.EXPLOSION)
+                            if (objectPool.caches[rndTemp].typeAction != TypeAction.EXPLOSION & objectPool.caches[rndTemp].typeAction != TypeAction.SPECIAL)
                             {
                                 ob = GameObjectPool.Spawn(objectPool.caches[rndTemp].prefab, GetRandomPos(pasture, meshpasture), Quaternion.Euler(0f, Random.Range(0, 360f), 0f));
                             }
                             else goto x;
-                            /*int rnd_2 = Random.Range(0, 100 - (int)percentSpawnExplosion);
-                            if (rnd_2 < (100 - percentSpawnExplosion) / 2)
-                            {
-                                for (int o = 0; o < objectPool.caches.Count; o++)
-                                {
-                                    if (objectPool.caches[o].typeAction == TypeAction.DECREASE)
-                                    {
-                                        ob = GameObjectPool.Spawn(objectPool.caches[o].prefab, GetRandomPos(pasture, meshpasture), Quaternion.Euler(0f, Random.Range(0, 360f), 0f));
-                                        break;
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                for (int o = 0; o < objectPool.caches.Count; o++)
-                                {
-                                    if (objectPool.caches[o].typeAction == TypeAction.INCREASE)
-                                    {
-                                        ob = GameObjectPool.Spawn(objectPool.caches[o].prefab, GetRandomPos(pasture, meshpasture), Quaternion.Euler(0f, Random.Range(0, 360f), 0f));
-                                        break;
-                                    }
-                                }
-                            }*/
                         }
                         allSheeps.Add(ob.GetComponent<NavMeshAgent>());
-                        NavMeshAgent navMeshAgent = ob.GetComponent<NavMeshAgent>();
-                        Target target = ob.GetComponent<Target>();
+                        navMeshAgent = ob.GetComponent<NavMeshAgent>();
+                        target = ob.GetComponent<Target>();
                         navMeshAgent.enabled = true;
                         rndPartPlace = Random.Range(0, cattleCorral.Count);
                         navMeshAgent.SetDestination(GetRandomPos(cattleCorral[rndPartPlace], meshCattleCorral[rndPartPlace]));
-                        Animator animator = ob.GetComponent<Animator>();
+                        animator = ob.GetComponent<Animator>();
                         animator.SetInteger("animation", 1);
                         animator.speed = navMeshAgent.speed + target.spedAnimationTarget;
                         target.SetPasture(pasture, meshpasture);
@@ -267,6 +261,12 @@ public class GameHelper : MonoBehaviour
 
         }
 
+    }
+    bool delayBetweenGateAndSpawn = false;
+    IEnumerator DelayBetweenGateAndSpawn()
+    {
+        yield return new WaitForSeconds(0.5f);
+        delayBetweenGateAndSpawn = true;
     }
 
     public void ButtonStartGame()
@@ -487,7 +487,9 @@ public class GameHelper : MonoBehaviour
 
     public void StartNextLevel()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+        if (SceneManager.sceneCountInBuildSettings != SceneManager.GetActiveScene().buildIndex + 1)
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+        else SceneManager.LoadScene(0);
     }
 
     public void Restart()
@@ -523,5 +525,6 @@ public class GameHelper : MonoBehaviour
         if (dravTutorial) StartCoroutine(WaitDrawUI(panelTutorial));
         else { ButtonStartGame(); }
         squareTargets = 0;
+        delayBetweenGateAndSpawn = false;
     }
 }

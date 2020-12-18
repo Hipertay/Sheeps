@@ -3265,7 +3265,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 432270250}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -2.05, y: -0.35517153, z: 0.2252931}
+  m_LocalPosition: {x: -2.13, y: -0.35517153, z: 0.2252931}
   m_LocalScale: {x: 0.074889034, y: 1, z: 0.6954808}
   m_Children: []
   m_Father: {fileID: 1178320073}
@@ -5413,8 +5413,8 @@ MonoBehaviour:
   timerSpawnTarget: 0.15
   maxSpawnTarget: 200
   spawnTargetOneMoument: 1
-  percentSpawnExplosion: 0
-  percentSpawnSpecial: 5
+  percentSpawnExplosion: 5
+  percentSpawnSpecial: 0
   _timeToNormal: 0.4
   _tempScale: 1
   waitStartGame: 0
@@ -5433,8 +5433,12 @@ MonoBehaviour:
   spawnInStartGame: 0
   corral: {fileID: 1178320074}
   gates:
+  - {fileID: 306939887}
+  - {fileID: 1600282051}
   - {fileID: 1704842808}
   pastures:
+  - {fileID: 657855393}
+  - {fileID: 1226569168}
   - {fileID: 432270252}
   targets: []
   targetsKick: []
@@ -7003,7 +7007,7 @@ MonoBehaviour:
   levelID: 3
   taskID: 0
   randomTask: 0
-  coralSize: 23
+  coralSize: 30
   tasks:
   - taskID: 0
     corralID: 0
@@ -7015,13 +7019,6 @@ MonoBehaviour:
       scaledPower: 2.5
       minSpedTarget: 1.25
       maxSpedTarget: 1.75
-    - prefab: {fileID: 1860942571928548, guid: 9cfa5981c1638154dace5f726d227597, type: 3}
-      cacheSize: 200
-      typeAction: 3
-      square: 3
-      scaledPower: 2.5
-      minSpedTarget: 0.75
-      maxSpedTarget: 1.25
 --- !u!4 &983397591
 Transform:
   m_ObjectHideFlags: 0
